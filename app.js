@@ -98,6 +98,7 @@ app.controller("scoreboardController", function ($scope, $interval, $timeout) {
 
   // Reset function to go back to setup or board
   $scope.resetQuiz = function () {
+    $scope.isBackBtn = false;
     $scope.resultScreen = false;
     $scope.quizBoardScreen = false; // Goes back to Setup
   };
