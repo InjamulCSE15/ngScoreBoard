@@ -32,9 +32,16 @@
 <body class="bg-gray-200 box-content md:box-border">
   <main class="h-screen" ng-controller="scoreboardController">
     <div ng-show="!resultScreen" class="px-6">
-      <button ng-show="isBackBtn" ng-click="quizBoardScreen = !quizBoardScreen; isBackBtn = false;"
-        class="inline-block rounded-lg border border-gray-600 bg-gray-600 px-4 py-2 text-sm font-medium text-white hover:bg-transparent hover:text-gray-600 my-3"><i
-          class="fa-solid fa-chevron-left"></i>Back</button>
+      <div ng-show="isBackBtn" class="flex items-center justify-between">
+        <button ng-click="quizBoardScreen = !quizBoardScreen; isBackBtn = false;"
+          class="inline-block rounded-lg border border-gray-600 bg-gray-600 px-4 py-2 text-sm font-medium text-white hover:bg-transparent hover:text-gray-600 my-3"><i
+            class="fa-solid fa-chevron-left"></i>Back</button>
+        <button class="text-white px-5 py-2 rounded-md" ng-class="isStart ? 'bg-red-500' : 'bg-green-500'"
+          ng-click="startQuiz()">
+          <span ng-if="!isStart"><i class="fa-solid fa-circle-play"></i> Start</span>
+          <span ng-if="isStart"><i class="fa-solid fa-clock-rotate-left"></i> {{countDown}}s</span>
+        </button>
+      </div>
       <section ng-show="!quizBoardScreen" class=" min-h-screen flex items-center justify-center">
         <article class="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
           <h1 class="text-2xl font-bold mb-4 text-center">Setup your score board</h1>
@@ -95,11 +102,7 @@
         <div class="flex justify-between items-center my-2">
           <h1 class="text-gray-800 font-bold text-xl capitalize"><span class="text-blue-600">Quiz Topic Name:
             </span>{{qSetup.title ? qSetup.title : 'Quiz'}}</h1>
-          <button class="text-white px-5 py-2 rounded-md" ng-class="isStart ? 'bg-red-500' : 'bg-green-500'"
-            ng-click="startQuiz()">
-            <span ng-if="!isStart"><i class="fa-solid fa-circle-play"></i> Start</span>
-            <span ng-if="isStart"><i class="fa-solid fa-clock-rotate-left"></i> {{countDown}}s</span>
-          </button>
+
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <div ng-repeat="person in examineeList"
@@ -181,7 +184,7 @@
         </div>
         <div class="my-5 flex flex-col sm:flex-row gap-4 justify-center">
           <button ng-click="resetQuiz()"
-            class="px-8 py-3 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition">
+            class="w-1/2 mx-auto px-6 py-3 bg-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-500 transition">
             New Quiz
           </button>
         </div>
