@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="scoreboardApp">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Scoreboard</title>
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- AngularJS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="app.js"></script>
+  <style>
+    .html,
+    body {
+      font-family: "Roboto", sans-serif !important;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-200">
+  <main class="" ng-controller="scoreboardController">
+    <div ng-show="!resultScreen" class="p-6">
+      <button ng-show="isBackBtn" ng-click="quizBoardScreen = !quizBoardScreen; isBackBtn = false;"
+        class="inline-block rounded-lg border border-gray-600 bg-gray-600 px-4 py-2 text-sm font-medium text-white hover:bg-transparent hover:text-gray-600 my-3"><i
+          class="fa-solid fa-chevron-left"></i>Back</button>
+      <section ng-show="!quizBoardScreen" class=" min-h-screen flex items-center justify-center">
+        <article class="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
+          <h1 class="text-2xl font-bold mb-4 text-center">Setup your score board</h1>
+          <!-- Score board setup Form -->
+          <form ng-submit="quizSetup()" class="space-y-3">
+            <div>
+              <label for="">Quiz Title<span class="text-red-500"> * </span></label>
+              <input type="text" ng-model="qSetup.title" placeholder="Unit 1, Lesson 1, etc"
+                class="w-full border p-2 rounded capitalize" required>
+            </div>
+            <div>
+              <label for="">Quiz Short Description</label>
+              <textarea name="" id="" ng-model="qSetup.details" placeholder="Short note about the quiz"
+                class="w-full border p-2 rounded "></textarea>
+            </div>
+            <div>
+              <label for="">Total No. of Question<span class="text-red-500"> * </span></label>
+              <input type="number" ng-model="qSetup.questionCount" placeholder="10" class="w-full border p-2 rounded"
+                required>
+            </div>
+            <div>
+              <label for="">Timer (second) Per question<span class="text-red-500"> * </span></label>
+              <input type="number" ng-model="qSetup.timer" min="10" placeholder="10" class="w-full border p-2 rounded"
+                required>
+            </div>
+            <div>
+              <label for="">Examinee<span class="text-red-500"> * </span></label>
+              <input type="number" min="2" ng-model="qSetup.examinee" placeholder="2" class="w-full border p-2 rounded"
+                required ng-blur="examineeInfo()">
+            </div>
+            <!-- <div class="mt-4" ng-show="examineeList.length > 0">
+          <table class="w-full border-collapse border">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="border p-2">#</th>
+                <th class="border p-2">Examinee Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="i in examineeList">
+                <td class="border p-2 text-center">{{ $index + 1 }}</td>
+                <td class="border p-2">
+                  <input type="text" ng-model="i.name" placeholder="Enter Name" class="w-full p-1 border rounded">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div> 
+        <button class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600" ng-show="examineeList.length > 0">-->
+            <button class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600" ng-disabled="examinee == 0">
+              Start Quiz
+            </button>
+          </form>
+        </article>
+      </section>
+
+      <section ng-show="quizBoardScreen">
+        <div class="flex justify-between items-center my-2">
+          <h1 class="text-gray-800 font-bold text-xl capitalize"><span class="text-blue-600">Quiz Topic Name:
+            </span>{{qSetup.title ? qSetup.title : 'Quiz'}}</h1>
+          <button class="text-white px-5 py-2 rounded-md" ng-class="isStart ? 'bg-red-500' : 'bg-green-500'"
+            ng-click="startQuiz()">
+            <span ng-if="!isStart"><i class="fa-solid fa-circle-play"></i> Start</span>
+            <span ng-if="isStart"><i class="fa-solid fa-clock-rotate-left"></i> {{countDown}}s</span>
+          </button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div ng-repeat="person in examineeList"
+            class="bg-white border-2 border-gray-100 rounded-xl p-5 shadow-sm hover:border-blue-400 transition-all">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
+                #{{ $index + 1 }}
+              </span>
+              <input type="text" ng-model="person.name" placeholder="Examinee Name"
+                class="font-bold text-gray-700 border-b border-transparent focus:border-blue-500 outline-none w-full">
+            </div>
+            <hr class="mb-4">
+            <div class="text-center">
+              <label class="text-xs uppercase tracking-widest text-gray-400 font-semibold">Obtain Marks</label>
+              <div class="flex items-center justify-center gap-6 mt-2">
+                <button type="button" ng-click="adjustMarks(person, -1)"
+                  class="w-10 h-10 rounded-lg bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-600 transition font-bold text-xl">
+                  -
+                </button>
+
+                <span class="text-4xl font-black text-gray-800 w-12">{{ person.marks }}</span>
+
+                <button type="button" ng-disabled="person.marks >= qSetup.questionCount"
+                  ng-click="adjustMarks(person, 1)"
+                  class="w-10 h-10 rounded-lg bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-600 transition font-bold text-xl">
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-4 text-center">
+              <span class="text-sm px-2 py-1 rounded bg-gray-50 text-gray-400">Marks out of
+                {{qSetup.questionCount}}</span>
+              <span class="text-[10px] px-2 py-1 rounded bg-green-100 text-green-700" ng-show="person.marks > 0">Active
+                Scoring</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-center items-center my-5" ng-show="hasAnyMarks()">
+          <div><button ng-click="publishResult()"
+              class="px-5 py-2 text-white border-green-200 bg-green-500 rounded">Publish Result</button></div>
+        </div>
+      </section>
+    </div>
+    <!-- Quiz Result Screen -->
+    <section ng-show="resultScreen" class="max-w-4xl mx-auto p-4">
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+        <div class="bg-indigo-600 p-6 text-center text-white">
+          <h1 class="text-2xl font-bold">Quiz Results</h1>
+          <p class="opacity-90 mt-2">{{qSetup.title}}</p>
+        </div>
+        <div class="p-6">
+          <div class="space-y-4">
+            <div ng-repeat="person in sortedExaminees"
+              class="flex items-center justify-between p-4 rounded-xl border transition-all"
+              ng-class="{'bg-yellow-50 border-yellow-200 scale-105 shadow-md': $index == 0, 'bg-gray-50 border-gray-200': $index > 0}">
+
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 flex items-center justify-center rounded-full font-black text-lg"
+                  ng-class="{'bg-yellow-400 text-yellow-900': $index == 0, 'bg-gray-300 text-gray-700': $index == 1, 'bg-orange-300 text-orange-900': $index == 2, 'bg-blue-100 text-blue-600': $index > 2}">
+                  {{ $index + 1 }}
+                </div>
+
+                <div class="w-96">
+                  <h3 class="font-bold text-gray-800 text-lg">{{ person.name || 'Anonymous' }}</h3>
+                  <p class="text-xs text-gray-500 uppercase tracking-widest">Examinee</p>
+                  <div class="relative flex items-center bg-gray-500/20 h-5 rounded-full">
+                    <div class="bg-blue-600 h-5 rounded-full" style="width: 66%;"></div>
+                    <span class="absolute inset-0 flex items-center justify-center text-xs font-semibold text-white">
+                      {{ person.marks }} /{{ qSetup.questionCount }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="my-5 flex flex-col sm:flex-row gap-4 justify-center">
+          <button ng-click="resetQuiz()"
+            class="px-8 py-3 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition">
+            New Quiz
+          </button>
+        </div>
+      </div>
+      </div>
+    </section>
+    <!-- Alert Error -->
+    <div ng-show="errAlert"
+      class="fixed top-10 right-4 max-w-xs w-full bg-red-500 text-white shadow-lg rounded-lg p-4 flex items-center space-x-3 transition-transform transform hover:scale-105">
+      <!--
+tags: [warning, error, shape, caution, alert]
+unicode: "f634"
+version: "1.117"
+-->
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+        <path d="M12 9v4" />
+        <path d="M12 16v.01" />
+      </svg>
+
+      <div class="flex-1">
+        <p class="font-bold">Validation Error</p>
+        <p class="text-sm">{{alertMsg}}</p>
+      </div>
+      <button ng-click="errAlert = false" class="text-white hover:text-gray-300 focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd"
+            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+            clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div> 
+  </main>
+  <footer class="relative ">
+    <div class="border border-top border-gray-300 fixed bottom-0 left-0 right-0  py-2">
+      <p class="text-center text-gray-500">Developed by <span class="text-gray-900">Injamul</span></p>
+
+    </div>
+  </footer>
+</body>
+
+</html>
